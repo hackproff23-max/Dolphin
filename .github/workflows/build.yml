@@ -1,0 +1,62 @@
+name: Build Dolphin APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: "Repositório original do Dolphin MMJR2 (dono/nome)"
+        required: true
+      ref:
+        description: "Branch ou tag (vazio = padrão)"
+        required: false
+        default: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar meu repositório (patch)
+        uses: actions/checkout@v4
+        with:
+          path: meu
+
+      - name: Baixar código original com submódulos
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.repo }}
+          ref: ${{ inputs.ref }}
+          submodules: recursive
+          path: src
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Aplicar patch
+        working-directory: src
+        run: patch -p1 --binary < ../meu/dolphin_g85.patch
+
+      - name: Criar keystore
+        working-directory: src/Source/Android
+        run: |
+          keytool -genkey -v -keystore meu.keystore -alias chave \
+            -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass 123456 -keypass 123456 -dname "CN=Dolphin"
+          cat > keystore.properties <<EOT
+          storeFile=../meu.keystore
+          storePassword=123456
+          keyAlias=chave
+          keyPassword=123456
+          EOT
+
+      - name: Compilar
+        working-directory: src/Source/Android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dolphin-apk
+          path: src/Source/Android/app/build/outputs/apk/release/*.apk

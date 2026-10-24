@@ -1,0 +1,61 @@
+diff -ru a/Source/Android/app/build.gradle b/Source/Android/app/build.gradle
+--- a/Source/Android/app/build.gradle	2026-10-24 17:18:05.002976436 +0000
++++ b/Source/Android/app/build.gradle	2026-10-24 17:18:05.236925966 +0000
+@@ -93,7 +93,7 @@
+     defaultConfig {
+         externalNativeBuild {
+             cmake {
+-                arguments "-DANDROID_STL=c++_static", "-DCMAKE_BUILD_TYPE=RelWithDebInfo"
++                arguments "-DANDROID_STL=c++_static", "-DCMAKE_BUILD_TYPE=Release"
+                 // , "-DENABLE_GENERIC=ON"
+ 
+                 abiFilters "arm64-v8a" //, "x86_64", "armeabi-v7a", "x86"
+diff -ru a/Source/Android/app/src/main/res/values/arrays.xml b/Source/Android/app/src/main/res/values/arrays.xml
+--- a/Source/Android/app/src/main/res/values/arrays.xml	2026-10-24 17:18:05.033248124 +0000
++++ b/Source/Android/app/src/main/res/values/arrays.xml	2026-10-24 17:18:05.236699569 +0000
+@@ -262,6 +262,7 @@
+     <!-- Internal Resolution Preference -->
+     <string-array name="internalResolutionEntries" translatable="false">
+         <item>1x Native (640x528)</item>
++        <item>1.4x Native (896x739)</item>
+         <item>1.5x Native (960x792)</item>
+         <item>2x Native (1280x1056) for 720p</item>
+         <item>2.5x Native (1600x1320)</item>
+@@ -273,6 +274,7 @@
+     </string-array>
+     <integer-array name="internalResolutionValues" translatable="false">
+         <item>100</item>
++        <item>140</item>
+         <item>150</item>
+         <item>200</item>
+         <item>250</item>
+diff -ru a/Source/Core/Core/Config/GraphicsSettings.cpp b/Source/Core/Core/Config/GraphicsSettings.cpp
+--- a/Source/Core/Core/Config/GraphicsSettings.cpp	2026-10-24 17:18:05.052698182 +0000
++++ b/Source/Core/Core/Config/GraphicsSettings.cpp	2026-10-24 17:18:05.183162164 +0000
+@@ -38,7 +38,7 @@
+     {System::GFX, "Settings", "WidescreenHeuristicWidescreenRatio"}, (16 / 9.f) / (4 / 3.f)};
+ const Info<bool> GFX_CROP{{System::GFX, "Settings", "Crop"}, false};
+ const Info<int> GFX_SAFE_TEXTURE_CACHE_COLOR_SAMPLES{
+-    {System::GFX, "Settings", "SafeTextureCacheColorSamples"}, 128};
++    {System::GFX, "Settings", "SafeTextureCacheColorSamples"}, 0};
+ const Info<bool> GFX_SHOW_FPS{{System::GFX, "Settings", "ShowFPS"}, true};
+ const Info<bool> GFX_SHOW_FTIMES{{System::GFX, "Settings", "ShowFTimes"}, false};
+ const Info<bool> GFX_SHOW_VPS{{System::GFX, "Settings", "ShowVPS"}, false};
+@@ -81,7 +81,7 @@
+ const Info<bool> GFX_FAST_DEPTH_CALC{{System::GFX, "Settings", "FastDepthCalc"}, true};
+ const Info<u32> GFX_MSAA{{System::GFX, "Settings", "MSAA"}, 1};
+ const Info<bool> GFX_SSAA{{System::GFX, "Settings", "SSAA"}, false};
+-const Info<int> GFX_EFB_SCALE{{System::GFX, "Settings", "InternalResolution"}, 100};
++const Info<int> GFX_EFB_SCALE{{System::GFX, "Settings", "InternalResolution"}, 140};
+ const Info<int> GFX_MAX_EFB_SCALE{{System::GFX, "Settings", "MaxInternalResolution"}, 12};
+ const Info<bool> GFX_TEXFMT_OVERLAY_ENABLE{{System::GFX, "Settings", "TexFmtOverlayEnable"}, false};
+ const Info<bool> GFX_TEXFMT_OVERLAY_CENTER{{System::GFX, "Settings", "TexFmtOverlayCenter"}, false};
+@@ -101,7 +101,7 @@
+ const Info<bool> GFX_WAIT_FOR_SHADERS_BEFORE_STARTING{
+     {System::GFX, "Settings", "WaitForShadersBeforeStarting"}, false};
+ const Info<ShaderCompilationMode> GFX_SHADER_COMPILATION_MODE{
+-    {System::GFX, "Settings", "ShaderCompilationMode"}, ShaderCompilationMode::Synchronous};
++    {System::GFX, "Settings", "ShaderCompilationMode"}, ShaderCompilationMode::AsynchronousSkipRendering};
+ const Info<int> GFX_SHADER_COMPILER_THREADS{{System::GFX, "Settings", "ShaderCompilerThreads"}, 1};
+ const Info<int> GFX_SHADER_PRECOMPILER_THREADS{
+     {System::GFX, "Settings", "ShaderPrecompilerThreads"}, -1};
